@@ -21,7 +21,7 @@ build_exe_options = {
     "packages": [
         "faster_whisper", "ctranslate2", "onnxruntime", "tokenizers",
         "huggingface_hub", "av", "numpy", "sounddevice", "_sounddevice_data",
-        "tkinter", "encodings", "speech_recognition", "deep_translator",
+        "tkinter", "encodings", "speech_recognition", "deep_translator", "sv_ttk",
     ],
     "excludes": ["pyautogui", "pyperclip", "matplotlib", "pandas", "scipy",
                  "torch", "IPython", "pytest", "PyQt5", "PyQt6"],

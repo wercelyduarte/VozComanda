@@ -34,6 +34,7 @@ DEPENDENCIAS = [
     ("faster_whisper", "faster-whisper"),
     ("speech_recognition", "SpeechRecognition"),
     ("deep_translator", "deep-translator"),
+    ("sv_ttk", "sv-ttk"),
 ]
 
 

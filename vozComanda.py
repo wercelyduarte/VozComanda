@@ -42,6 +42,11 @@ try:
 except ImportError:
     WhisperModel = None
 
+try:
+    import sv_ttk as _sv_ttk
+except ImportError:
+    _sv_ttk = None
+
 # ------------------------------------------------------------------ config
 if getattr(sys, "frozen", False):
     APP_DIR = os.path.dirname(sys.executable)
@@ -177,10 +182,38 @@ def _dividir_texto(texto: str, limite: int = _LIMITE_MM) -> list:
     return blocos
 
 # ------------------------------------------------------------------ paleta
-C_BG      = "#f0f2f5"
-C_PANEL   = "#ffffff"
+PALETA = {
+    "dark": {
+        "C_BG":    "#1a1b2e",
+        "C_PANEL": "#252636",
+        "C_BORDER":"#3a3b4e",
+        "C_TEXT":  "#e2e8f0",
+        "C_TEXT2": "#94a3b8",
+        "C_SEL":   "#3b4f7a",
+        "ST_OK":   "#052e16",
+        "ST_INFO": "#0c1a3a",
+        "ST_WARN": "#2d1b00",
+        "ST_ERR":  "#2d0b0b",
+    },
+    "light": {
+        "C_BG":    "#f0f2f5",
+        "C_PANEL": "#ffffff",
+        "C_BORDER":"#d1d5db",
+        "C_TEXT":  "#111827",
+        "C_TEXT2": "#6b7280",
+        "C_SEL":   "#bfdbfe",
+        "ST_OK":   "#f0fdf4",
+        "ST_INFO": "#eff6ff",
+        "ST_WARN": "#fffbeb",
+        "ST_ERR":  "#fef2f2",
+    },
+}
+
+# Valores iniciais: dark (padrao). Atualizados por _aplicar_tema().
+C_BG      = PALETA["dark"]["C_BG"]
+C_PANEL   = PALETA["dark"]["C_PANEL"]
 C_HEADER  = "#1a56db"
-C_BORDER  = "#d1d5db"
+C_BORDER  = PALETA["dark"]["C_BORDER"]
 C_REC     = "#dc2626"
 C_REC_DK  = "#991b1b"
 C_REC_LT  = "#ef4444"
@@ -191,8 +224,8 @@ C_OK      = "#16a34a"
 C_INFO    = "#1d4ed8"
 C_WARN    = "#b45309"
 C_ERR     = "#b91c1c"
-C_TEXT    = "#111827"
-C_TEXT2   = "#6b7280"
+C_TEXT    = PALETA["dark"]["C_TEXT"]
+C_TEXT2   = PALETA["dark"]["C_TEXT2"]
 
 
 def opcoes_disponiveis():
@@ -291,6 +324,9 @@ class VozComandaApp:
             idioma_alvo = IDIOMA_ALVO_PAD
         self.var_idioma_alvo = tk.StringVar(value=idioma_alvo)
 
+        self._tema = cfg.get("tema", "dark")
+        self._borders = []   # tk.Frame separadores — atualizados em _recolorir_ui
+
         self._aplicar_tema()
         self._build_ui()
         self._atualizar_info_modelo()
@@ -304,15 +340,35 @@ class VozComandaApp:
                 "warn")
 
     # ---------------------------------------------------------------- tema
-    def _aplicar_tema(self):
-        s = ttk.Style(self.root)
-        s.theme_use("clam")
-        s.configure("TFrame",       background=C_BG)
-        s.configure("TLabel",       background=C_BG, foreground=C_TEXT, font=("Segoe UI", 10))
-        s.configure("TButton",      font=("Segoe UI", 10), padding=(10, 6))
-        s.configure("TCombobox",    font=("Segoe UI", 10))
-        s.configure("TProgressbar", troughcolor=C_BORDER, background=C_INFO, thickness=4)
-        s.configure("TSeparator",   background=C_BORDER)
+    def _aplicar_tema(self, tema=None):
+        if tema is not None:
+            self._tema = tema
+        p = PALETA[self._tema]
+        global C_BG, C_PANEL, C_BORDER, C_TEXT, C_TEXT2
+        C_BG    = p["C_BG"]
+        C_PANEL = p["C_PANEL"]
+        C_BORDER= p["C_BORDER"]
+        C_TEXT  = p["C_TEXT"]
+        C_TEXT2 = p["C_TEXT2"]
+        self._STATUS_COR = {
+            "ok":   (C_OK,   p["ST_OK"]),
+            "info": (C_INFO, p["ST_INFO"]),
+            "warn": (C_WARN, p["ST_WARN"]),
+            "err":  (C_ERR,  p["ST_ERR"]),
+            "idle": (C_TEXT2, C_BG),
+        }
+        self.root.configure(bg=C_BG)
+        if _sv_ttk:
+            _sv_ttk.set_theme(self._tema)
+        else:
+            s = ttk.Style(self.root)
+            s.theme_use("clam")
+            s.configure("TFrame",       background=C_BG)
+            s.configure("TLabel",       background=C_BG, foreground=C_TEXT, font=("Segoe UI", 10))
+            s.configure("TButton",      font=("Segoe UI", 10), padding=(10, 6))
+            s.configure("TCombobox",    font=("Segoe UI", 10))
+            s.configure("TProgressbar", troughcolor=C_BORDER, background=C_INFO, thickness=4)
+            s.configure("TSeparator",   background=C_BORDER)
 
     # ---------------------------------------------------------------- UI
     def _build_ui(self):
@@ -329,14 +385,15 @@ class VozComandaApp:
                  fg="#93c5fd", font=("Segoe UI", 9)).pack(side=tk.LEFT, anchor=tk.S, pady=14)
 
         # ---- Linha modelo
-        frm_mdl = tk.Frame(self.root, bg=C_PANEL)
+        self._frm_mdl = frm_mdl = tk.Frame(self.root, bg=C_PANEL)
         frm_mdl.pack(fill=tk.X)
-        tk.Frame(frm_mdl, bg=C_BORDER, height=1).pack(fill=tk.X)
-        inner = tk.Frame(frm_mdl, bg=C_PANEL)
+        b = tk.Frame(frm_mdl, bg=C_BORDER, height=1); b.pack(fill=tk.X); self._borders.append(b)
+        self._inner_mdl = inner = tk.Frame(frm_mdl, bg=C_PANEL)
         inner.pack(fill=tk.X, padx=14, pady=8)
 
-        tk.Label(inner, text="Modelo:", bg=C_PANEL, fg=C_TEXT,
-                 font=("Segoe UI", 10)).pack(side=tk.LEFT)
+        self._lbl_mdl_pfx = tk.Label(inner, text="Modelo:", bg=C_PANEL, fg=C_TEXT,
+                 font=("Segoe UI", 10))
+        self._lbl_mdl_pfx.pack(side=tk.LEFT)
         self.cmb_modelo = ttk.Combobox(inner, textvariable=self.modelo_sel,
                                        values=opcoes_disponiveis(), state="readonly", width=18)
         self.cmb_modelo.pack(side=tk.LEFT, padx=(8, 6))
@@ -349,9 +406,9 @@ class VozComandaApp:
                                    font=("Segoe UI", 9))
         self.lbl_modelo.pack(side=tk.LEFT)
 
-        # Botao de configuracao de pasta (direita)
+        # Botao de configuracao (pasta + tema)
         self.btn_pasta = tk.Button(
-            inner, text="⚙", command=self._trocar_pasta,
+            inner, text="⚙", command=self._abrir_menu_config,
             bg=C_PANEL, fg=C_TEXT2,
             activebackground=C_BG, activeforeground=C_TEXT,
             font=("Segoe UI", 10), relief="flat", bd=0,
@@ -371,16 +428,17 @@ class VozComandaApp:
         )
         self.chk_pont.pack(side=tk.RIGHT, padx=(0, 8))
 
-        tk.Frame(frm_mdl, bg=C_BORDER, height=1).pack(fill=tk.X)
+        b = tk.Frame(frm_mdl, bg=C_BORDER, height=1); b.pack(fill=tk.X); self._borders.append(b)
 
         # ---- Linha idioma / traducao
-        frm_lang = tk.Frame(self.root, bg=C_PANEL)
+        self._frm_lang = frm_lang = tk.Frame(self.root, bg=C_PANEL)
         frm_lang.pack(fill=tk.X)
-        inner_lang = tk.Frame(frm_lang, bg=C_PANEL)
+        self._inner_lang = inner_lang = tk.Frame(frm_lang, bg=C_PANEL)
         inner_lang.pack(fill=tk.X, padx=14, pady=6)
 
-        tk.Label(inner_lang, text="Idioma de voz:", bg=C_PANEL, fg=C_TEXT,
-                 font=("Segoe UI", 9)).pack(side=tk.LEFT)
+        self._lbl_idioma_pfx = tk.Label(inner_lang, text="Idioma de voz:", bg=C_PANEL, fg=C_TEXT,
+                 font=("Segoe UI", 9))
+        self._lbl_idioma_pfx.pack(side=tk.LEFT)
         self.cmb_idioma = ttk.Combobox(
             inner_lang, textvariable=self.var_idioma_voz,
             values=list(IDIOMAS_VOZ.keys()), state="readonly", width=14,
@@ -403,13 +461,13 @@ class VozComandaApp:
         self.cmb_alvo.bind("<<ComboboxSelected>>", lambda e: self._salvar_idiomas())
         self._toggle_traducao()  # aplica estado inicial (habilita/desabilita combobox)
 
-        tk.Frame(frm_lang, bg=C_BORDER, height=1).pack(fill=tk.X)
+        b = tk.Frame(frm_lang, bg=C_BORDER, height=1); b.pack(fill=tk.X); self._borders.append(b)
 
         # ---- Progressbar (oculta por padrao)
         self.progress = ttk.Progressbar(self.root, mode="indeterminate")
 
         # ---- Controles
-        frm_ctrl = tk.Frame(self.root, bg=C_BG)
+        self._frm_ctrl = frm_ctrl = tk.Frame(self.root, bg=C_BG)
         frm_ctrl.pack(fill=tk.X, padx=14, pady=(12, 6))
 
         self.btn_gravar = tk.Button(
@@ -451,11 +509,12 @@ class VozComandaApp:
         self._fwd_bar = self.cnv_nivel.create_rectangle(0, 2, 0,    6, fill=C_READY,  outline="")
 
         # ---- Area de texto
-        frm_txt = tk.Frame(self.root, bg=C_BG)
+        self._frm_txt = frm_txt = tk.Frame(self.root, bg=C_BG)
         frm_txt.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 6))
 
-        tk.Label(frm_txt, text="Texto transcrito  —  edite se precisar antes de salvar:",
-                 bg=C_BG, fg=C_TEXT2, font=("Segoe UI", 9)).pack(anchor=tk.W, pady=(0, 4))
+        self._lbl_txt_hint = tk.Label(frm_txt, text="Texto transcrito  —  edite se precisar antes de salvar:",
+                 bg=C_BG, fg=C_TEXT2, font=("Segoe UI", 9))
+        self._lbl_txt_hint.pack(anchor=tk.W, pady=(0, 4))
 
         self.txt = scrolledtext.ScrolledText(
             frm_txt,
@@ -477,7 +536,7 @@ class VozComandaApp:
         # ---- Barra de status
         self.frm_status = tk.Frame(self.root, bg=C_BG)
         self.frm_status.pack(fill=tk.X, side=tk.BOTTOM)
-        tk.Frame(self.frm_status, bg=C_BORDER, height=1).pack(fill=tk.X)
+        b = tk.Frame(self.frm_status, bg=C_BORDER, height=1); b.pack(fill=tk.X); self._borders.append(b)
         self.lbl_status = tk.Label(
             self.frm_status, text="Iniciando...",
             bg=C_BG, fg=C_TEXT2,
@@ -703,7 +762,6 @@ class VozComandaApp:
         return pasta
 
     def _trocar_pasta(self):
-        """Abre dialogo para trocar a pasta de saida."""
         from tkinter import filedialog
         pasta = filedialog.askdirectory(
             title="Trocar pasta de saida do VozComanda",
@@ -716,6 +774,63 @@ class VozComandaApp:
         cfg["save_dir"] = pasta
         salvar_config(cfg)
         self.set_status(f"Pasta de saida: {pasta}", "ok")
+
+    def _abrir_menu_config(self):
+        esc = "✓  " if self._tema == "dark"  else "     "
+        cla = "✓  " if self._tema == "light" else "     "
+        menu = tk.Menu(self.root, tearoff=0)
+        menu.add_command(label="Trocar pasta de salvamento", command=self._trocar_pasta)
+        menu.add_separator()
+        menu.add_command(label=f"{esc}🌙  Tema escuro", command=lambda: self._trocar_tema("dark"))
+        menu.add_command(label=f"{cla}☀️   Tema claro",  command=lambda: self._trocar_tema("light"))
+        x = self.btn_pasta.winfo_rootx()
+        y = self.btn_pasta.winfo_rooty() + self.btn_pasta.winfo_height()
+        menu.tk_popup(x, y)
+
+    def _trocar_tema(self, tema):
+        if tema == self._tema:
+            return
+        self._aplicar_tema(tema)
+        self._recolorir_ui()
+        cfg = carregar_config()
+        cfg["tema"] = tema
+        salvar_config(cfg)
+
+    def _recolorir_ui(self):
+        p = PALETA[self._tema]
+        sel = p["C_SEL"]
+        # Frames principais
+        self._frm_mdl.configure(bg=C_PANEL)
+        self._inner_mdl.configure(bg=C_PANEL)
+        self._frm_lang.configure(bg=C_PANEL)
+        self._inner_lang.configure(bg=C_PANEL)
+        self._frm_ctrl.configure(bg=C_BG)
+        self._frm_txt.configure(bg=C_BG)
+        self.frm_status.configure(bg=C_BG)
+        # Separadores
+        for b in self._borders:
+            b.configure(bg=C_BORDER)
+        # Labels
+        self._lbl_mdl_pfx.configure(bg=C_PANEL, fg=C_TEXT)
+        self._lbl_idioma_pfx.configure(bg=C_PANEL, fg=C_TEXT)
+        self._lbl_txt_hint.configure(bg=C_BG, fg=C_TEXT2)
+        self.lbl_modelo.configure(bg=C_PANEL)
+        self.lbl_status.configure(bg=C_BG, fg=C_TEXT2)
+        # Botao gear e checkboxes
+        self.btn_pasta.configure(bg=C_PANEL, fg=C_TEXT2,
+                                 activebackground=C_BG, activeforeground=C_TEXT)
+        self.btn_pasta.bind("<Leave>", lambda e: self.btn_pasta.config(fg=C_TEXT2))
+        self.btn_pasta.bind("<Enter>", lambda e: self.btn_pasta.config(fg=C_TEXT))
+        for chk in (self.chk_pont, self.chk_trad):
+            chk.configure(bg=C_PANEL, fg=C_TEXT, activebackground=C_PANEL, selectcolor=C_PANEL)
+        # Canvas de nivel
+        self.cnv_nivel.configure(bg=C_BG)
+        self.cnv_nivel.itemconfig(self._bg_bar, fill=C_BORDER)
+        # Caixa de texto
+        self.txt.configure(bg=C_PANEL, fg=C_TEXT,
+                           insertbackground=C_INFO,
+                           selectbackground=sel, selectforeground=C_TEXT,
+                           highlightbackground=C_BORDER, highlightcolor=C_INFO)
 
     def carregar_modelo(self):
         if self.carregando or self.gravando:
