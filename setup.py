@@ -10,7 +10,7 @@ import sys
 from cx_Freeze import setup, Executable
 
 APP_NAME = "VozComanda"
-VERSION = os.environ.get("VERSAO", "1.1.0")
+VERSION = os.environ.get("VERSAO", "1.2.0")
 DESCRIPTION = "Ditado por voz para agentes IA (Google online + faster-whisper offline)"
 
 # base "gui" esconde a janela preta do console no Windows
