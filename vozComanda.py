@@ -406,7 +406,7 @@ class VozComandaApp:
                                    font=("Segoe UI", 9))
         self.lbl_modelo.pack(side=tk.LEFT)
 
-        # Botao de configuracao (pasta + tema)
+        # Botao de configuracao (apenas pasta)
         self.btn_pasta = tk.Button(
             inner, text="⚙", command=self._abrir_menu_config,
             bg=C_PANEL, fg=C_TEXT2,
@@ -417,6 +417,19 @@ class VozComandaApp:
         self.btn_pasta.pack(side=tk.RIGHT, padx=(0, 4))
         self.btn_pasta.bind("<Enter>", lambda e: self.btn_pasta.config(fg=C_TEXT))
         self.btn_pasta.bind("<Leave>", lambda e: self.btn_pasta.config(fg=C_TEXT2))
+
+        # Botao de alternância de tema (🌙 dark / ☀️ light)
+        _icone_tema = "🌙" if self._tema == "dark" else "☀️"
+        self.btn_tema = tk.Button(
+            inner, text=_icone_tema, command=self._toggle_tema,
+            bg=C_PANEL, fg=C_TEXT2,
+            activebackground=C_BG, activeforeground=C_TEXT,
+            font=("Segoe UI", 10), relief="flat", bd=0,
+            padx=4, pady=2, cursor="hand2",
+        )
+        self.btn_tema.pack(side=tk.RIGHT, padx=(0, 2))
+        self.btn_tema.bind("<Enter>", lambda e: self.btn_tema.config(fg=C_TEXT))
+        self.btn_tema.bind("<Leave>", lambda e: self.btn_tema.config(fg=C_TEXT2))
 
         # Checkbox pontuacao (direita, antes do botao pasta)
         self.chk_pont = tk.Checkbutton(
@@ -776,16 +789,14 @@ class VozComandaApp:
         self.set_status(f"Pasta de saida: {pasta}", "ok")
 
     def _abrir_menu_config(self):
-        esc = "✓  " if self._tema == "dark"  else "     "
-        cla = "✓  " if self._tema == "light" else "     "
         menu = tk.Menu(self.root, tearoff=0)
         menu.add_command(label="Trocar pasta de salvamento", command=self._trocar_pasta)
-        menu.add_separator()
-        menu.add_command(label=f"{esc}🌙  Tema escuro", command=lambda: self._trocar_tema("dark"))
-        menu.add_command(label=f"{cla}☀️   Tema claro",  command=lambda: self._trocar_tema("light"))
         x = self.btn_pasta.winfo_rootx()
         y = self.btn_pasta.winfo_rooty() + self.btn_pasta.winfo_height()
         menu.tk_popup(x, y)
+
+    def _toggle_tema(self):
+        self._trocar_tema("light" if self._tema == "dark" else "dark")
 
     def _trocar_tema(self, tema):
         if tema == self._tema:
@@ -816,11 +827,16 @@ class VozComandaApp:
         self._lbl_txt_hint.configure(bg=C_BG, fg=C_TEXT2)
         self.lbl_modelo.configure(bg=C_PANEL)
         self.lbl_status.configure(bg=C_BG, fg=C_TEXT2)
-        # Botao gear e checkboxes
+        # Botoes gear e tema, e checkboxes
         self.btn_pasta.configure(bg=C_PANEL, fg=C_TEXT2,
                                  activebackground=C_BG, activeforeground=C_TEXT)
         self.btn_pasta.bind("<Leave>", lambda e: self.btn_pasta.config(fg=C_TEXT2))
         self.btn_pasta.bind("<Enter>", lambda e: self.btn_pasta.config(fg=C_TEXT))
+        _icone = "🌙" if self._tema == "dark" else "☀️"
+        self.btn_tema.configure(bg=C_PANEL, fg=C_TEXT2, text=_icone,
+                                activebackground=C_BG, activeforeground=C_TEXT)
+        self.btn_tema.bind("<Leave>", lambda e: self.btn_tema.config(fg=C_TEXT2))
+        self.btn_tema.bind("<Enter>", lambda e: self.btn_tema.config(fg=C_TEXT))
         for chk in (self.chk_pont, self.chk_trad):
             chk.configure(bg=C_PANEL, fg=C_TEXT, activebackground=C_PANEL, selectcolor=C_PANEL)
         # Canvas de nivel
