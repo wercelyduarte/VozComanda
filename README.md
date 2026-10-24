@@ -104,7 +104,7 @@ Instala as dependências na primeira vez e abre o aplicativo.
 ### Via terminal
 
 ```bash
-python bootstrap.py
+python vozComanda_bootstrap.py
 ```
 
 ### Fluxo de uso
@@ -171,15 +171,15 @@ pip install -r requirements-build.txt
 ## Estrutura do projeto
 
 ```
-voz_comando/
-├── voz_comando.py          # aplicativo principal
-├── bootstrap.py            # instala dependências e abre o app
+vozComanda/
+├── vozComanda.py               # aplicativo principal
+├── vozComanda_bootstrap.py     # instala dependências e abre o app
 ├── rodar.bat               # launcher Windows (duplo clique)
 ├── build.bat               # gera o executável (.exe / .msi)
 ├── setup.py                # configuração cx_Freeze
 ├── requirements.txt        # dependências de runtime
 ├── requirements-build.txt  # dependências de build (cx_Freeze)
-├── gerar_icone.py          # recria icone.ico (opcional)
+├── vozComanda_icone.py         # recria icone.ico (opcional)
 ├── icone.ico               # ícone da janela
 └── config.json             # preferências  [gerado em uso]
 ```

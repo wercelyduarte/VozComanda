@@ -1,8 +1,8 @@
 @echo off
 REM ============================================================
-REM  voz_comando - launcher (qualquer PC Windows)
+REM  VozComanda - launcher (qualquer PC Windows)
 REM  1. Acha um interpretador Python (py launcher ou python no PATH)
-REM  2. Roda bootstrap.py, que instala dependencias faltantes via pip
+REM  2. Roda vozComanda_bootstrap.py, que instala dependencias faltantes via pip
 REM  3. So entao abre o app de voz
 REM ============================================================
 cd /d "%~dp0"
@@ -34,7 +34,7 @@ if not defined PY_CMD (
 )
 
 echo [rodar] Usando: %PY_CMD%
-%PY_CMD% bootstrap.py
+%PY_CMD% vozComanda_bootstrap.py
 if errorlevel 1 (
   echo.
   echo [rodar] Falha no bootstrap. Veja mensagens acima.

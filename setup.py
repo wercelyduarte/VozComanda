@@ -37,7 +37,7 @@ bdist_msi_options = {
 
 executables = [
     Executable(
-        "voz_comando.py",
+        "vozComanda.py",
         base=base,
         target_name=f"{APP_NAME}.exe",
         icon="icone.ico",

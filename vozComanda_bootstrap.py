@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Bootstrapper do voz_comando.
+Bootstrapper do VozComanda.
 
 Garante que todas as dependencias estejam instaladas ANTES de abrir o app.
 Pensado para rodar em qualquer PC Windows que tenha o interpretador Python
@@ -12,7 +12,7 @@ Fluxo:
   1. Tenta importar cada dependencia.
   2. Se faltar alguma, instala via 'pip install <pkg==versao>' (versao
      minima pega do requirements.txt).
-  3. So entao import (lazy) e dispara voz_comando.main().
+  3. So entao import (lazy) e dispara vozComanda.main().
 
 Nada aqui depende de pacotes de terceiros -- usa apenas stdlib + sys.executable
 para chamar o pip do mesmo Python que roda este script.
@@ -120,7 +120,7 @@ def garantir_deps():
 
 def main():
     print("=" * 60)
-    print(" voz_comando - verificacao de ambiente")
+    print(" VozComanda - verificacao de ambiente")
     print("=" * 60)
     print(f"Python: {sys.executable} ({sys.version.split()[0]})")
     print(f"Local : {BASE_DIR}")
@@ -135,8 +135,8 @@ def main():
     print()
     print("[bootstrap] Ambiente OK. Abrindo o app...")
     # Import so agora, depois de garantir que existe.
-    import voz_comando
-    voz_comando.main()
+    import vozComanda
+    vozComanda.main()
 
 
 if __name__ == "__main__":
