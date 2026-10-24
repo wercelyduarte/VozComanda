@@ -1,0 +1,34 @@
+# Preferências do usuário (pode conter e-mail)
+config.json
+
+# Arquivos gerados pelo app
+comando.txt
+historico/
+
+# Modelos de voz (baixados em uso, até 3 GB)
+models_whisper/
+model/
+
+# Build e distribuição
+build/
+dist/
+*.egg-info/
+installer.iss
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Ambiente virtual
+venv/
+env/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
