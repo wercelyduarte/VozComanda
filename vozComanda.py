@@ -285,10 +285,10 @@ class VozComandaApp:
     def __init__(self, root):
         self.root = root
         self.root.title("VozComanda")
-        self.root.geometry("740x640")
+        self.root.geometry("840x640")
         self.root.configure(bg=C_BG)
         self.root.resizable(True, True)
-        self.root.minsize(560, 500)
+        self.root.minsize(660, 500)
         try:
             self.root.iconbitmap(os.path.join(APP_DIR, "icone.ico"))
         except Exception:
@@ -519,7 +519,7 @@ class VozComandaApp:
         self.cnv_nivel = tk.Canvas(self.root, height=8, bg=C_BG, highlightthickness=0)
         self.cnv_nivel.pack(fill=tk.X, padx=14, pady=(0, 6))
         self._bg_bar  = self.cnv_nivel.create_rectangle(0, 2, 4000, 6, fill=C_BORDER, outline="")
-        self._fwd_bar = self.cnv_nivel.create_rectangle(0, 2, 0,    6, fill=C_READY,  outline="")
+        self._fwd_bar = self.cnv_nivel.create_rectangle(0, 2, 0,    6, fill=C_TEXT2,  outline="")
 
         # ---- Area de texto
         self._frm_txt = frm_txt = tk.Frame(self.root, bg=C_BG)
@@ -604,7 +604,7 @@ class VozComandaApp:
         if w < 4:
             return
         preenchido = max(0, min(int(w * val), w))
-        cor = C_REC if self.gravando else C_READY
+        cor = C_REC if self.gravando else C_TEXT2
         self.cnv_nivel.coords(self._bg_bar,  0, 2, w,          6)
         self.cnv_nivel.coords(self._fwd_bar, 0, 2, preenchido, 6)
         self.cnv_nivel.itemconfig(self._fwd_bar, fill=cor)
