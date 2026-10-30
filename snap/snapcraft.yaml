@@ -32,7 +32,7 @@ icon: snap/gui/vozcomanda.png
 
 apps:
   vozcomanda:
-    command: usr/bin/python3 $SNAP/app/vozComanda.py
+    command: usr/bin/python3.12 $SNAP/app/vozComanda.py
     desktop: app/vozcomanda.desktop
     # Sem a extensao gnome: ela omite os pacotes que a plataforma GNOME ja tem, inclusive
     # o Python, e o Python dela nao tem Tkinter. O Tk so precisa de X11 e das fontes.
