@@ -65,7 +65,12 @@ parts:
       craftctl default
       rm -f setup.py
     stage-packages:
-      - python3-venv      # o base core24 nao tem Python: o snap leva o seu
+      # O base core24 nao tem Python: o snap leva o seu. Os pacotes do interpretador vao
+      # listados porque, como simples dependencias, o snapcraft os deixa de fora.
+      - python3.12-minimal
+      - libpython3.12-minimal
+      - libpython3.12-stdlib
+      - python3-venv
       - python3-tk
       - libportaudio2     # sounddevice
       - libasound2-plugins  # ponte ALSA -> PulseAudio
@@ -80,7 +85,8 @@ parts:
     source: .
     override-pull: |
       craftctl default
-      craftctl set version="$(git describe --tags --abbrev=0 | sed 's/^v//')"
+      # A copia da parte nao e um repositorio git: a tag vem da pasta do projeto
+      craftctl set version="$(git -c safe.directory='*' -C "$CRAFT_PROJECT_DIR" describe --tags --abbrev=0 | sed 's/^v//')"
     organize:
       vozComanda.py: app/vozComanda.py
       icone.png: app/icone.png
