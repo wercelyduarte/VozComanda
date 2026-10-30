@@ -46,6 +46,16 @@ jobs:
           name: instalador
           path: dist/*.msi
 
+      # Sem assinatura (a Store assina): vai como artefato da execucao, nao na release,
+      # porque o Windows nao instala um .msix nao assinado direto do download.
+      - name: Gerar .msix (Microsoft Store)
+        run: python build_msix.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msix-store
+          path: dist/*.msix
+
       - name: Publicar na pagina de Releases
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2

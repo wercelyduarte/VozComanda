@@ -6,11 +6,29 @@ Build do Voz Comando com cx_Freeze.
   python setup.py bdist_msi    -> instalador .msi em dist\\
 """
 import os
+import subprocess
 import sys
+from pathlib import Path
 from cx_Freeze import setup, Executable
 
 APP_NAME = "VozComanda"
-VERSION = os.environ.get("VERSAO", "1.2.2")
+
+
+def _version() -> str:
+    """VERSAO (definida pelo workflow de release) ou a ultima tag do git, para o build local
+    sair com a versao da ultima release sem precisar editar este arquivo."""
+    if os.environ.get("VERSAO"):
+        return os.environ["VERSAO"]
+    try:
+        tag = subprocess.run(["git", "describe", "--tags", "--abbrev=0"], capture_output=True,
+                             text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "1.0.0"
+    return tag.lstrip("v") or "1.0.0"
+
+
+VERSION = _version()
+Path("VERSION").write_text(VERSION, encoding="utf-8")   # vai junto do .exe; o build_msix.py le
 DESCRIPTION = "Ditado por voz para agentes IA (Google online + faster-whisper offline)"
 
 # base "gui" esconde a janela preta do console no Windows
@@ -25,7 +43,8 @@ build_exe_options = {
     ],
     "excludes": ["pyautogui", "pyperclip", "matplotlib", "pandas", "scipy",
                  "torch", "IPython", "pytest", "PyQt5", "PyQt6"],
-    "include_files": [("icone.ico", "icone.ico")],  # icone da janela do app
+    "include_files": [("icone.ico", "icone.ico"),  # icone da janela do app
+                      ("VERSION", "VERSION")],
     "include_msvcr": True,
     "optimize": 1,
 }

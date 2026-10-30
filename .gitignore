@@ -32,3 +32,6 @@ env/
 .idea/
 *.suo
 *.user
+
+# Gerado pelo setup.py a cada build
+VERSION

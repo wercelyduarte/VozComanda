@@ -166,6 +166,15 @@ Requer instalação prévia das dependências de build:
 pip install -r requirements-build.txt
 ```
 
+### Microsoft Store (.msix)
+
+```bash
+python setup.py build_exe
+python build_msix.py     # gera dist\VozComanda-X.Y.Z.msix (requer o Windows SDK)
+```
+
+O pacote sai sem assinatura: a Store assina ao publicar. O workflow de release também gera o `.msix`, como artefato da execução. Os textos da Store estão em [docs/store-listing.md](docs/store-listing.md) e a política de privacidade em [PRIVACY.md](PRIVACY.md).
+
 ---
 
 ## Estrutura do projeto
