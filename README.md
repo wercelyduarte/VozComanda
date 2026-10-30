@@ -246,8 +246,4 @@ vozComanda/
 
 ## Licença
 
-MIT — uso livre, inclusive comercial.
-
-## Licença
-
-[MIT](LICENSE) — uso, cópia e modificação livres, mantendo o aviso de copyright.
+[MIT](LICENSE) — uso livre, inclusive comercial.
