@@ -183,49 +183,64 @@ def _dividir_texto(texto: str, limite: int = _LIMITE_MM) -> list:
 
 # ------------------------------------------------------------------ paleta
 PALETA = {
+    # Mesmo estilo do AI Router Manager (customtkinter, modo dark, tema "blue")
     "dark": {
-        "C_BG":    "#1a1b2e",
-        "C_PANEL": "#252636",
-        "C_BORDER":"#3a3b4e",
-        "C_TEXT":  "#e2e8f0",
-        "C_TEXT2": "#94a3b8",
-        "C_SEL":   "#3b4f7a",
-        "ST_OK":   "#052e16",
-        "ST_INFO": "#0c1a3a",
-        "ST_WARN": "#2d1b00",
-        "ST_ERR":  "#2d0b0b",
+        "C_BG":     "#242424",  # gray14 — janela
+        "C_PANEL":  "#2b2b2b",  # gray17 — frames
+        "C_BORDER": "#474747",  # gray28 — borda de frame
+        "C_TEXT":   "#e5e5e5",  # gray90
+        "C_TEXT2":  "#bebebe",  # "gray"
+        "C_SEL":    "#1f538d",  # item selecionado
+        "C_HEADER": "#1f538d",
+        "C_REC":    "#c0392b",
+        "C_REC_DK": "#922b21",
+        "C_REC_LT": "#e74c3c",
+        "C_READY":  "#1f6aa5",  # botao padrao do tema blue
+        "C_READY_H":"#144870",
+        "C_TRAN":   "#7f7f7f",  # gray50
+        "C_OK":     "#27ae60",
+        "C_INFO":   "#3498db",
+        "C_WARN":   "#e67e22",
+        "C_ERR":    "#c0392b",
+        "ST_OK":    "#24392d",
+        "ST_INFO":  "#26353f",
+        "ST_WARN":  "#413224",
+        "ST_ERR":   "#3b2725",
     },
     "light": {
-        "C_BG":    "#f0f2f5",
-        "C_PANEL": "#ffffff",
-        "C_BORDER":"#d1d5db",
-        "C_TEXT":  "#111827",
-        "C_TEXT2": "#6b7280",
-        "C_SEL":   "#bfdbfe",
-        "ST_OK":   "#f0fdf4",
-        "ST_INFO": "#eff6ff",
-        "ST_WARN": "#fffbeb",
-        "ST_ERR":  "#fef2f2",
+        "C_BG":     "#f0f2f5",
+        "C_PANEL":  "#ffffff",
+        "C_BORDER": "#d1d5db",
+        "C_TEXT":   "#111827",
+        "C_TEXT2":  "#6b7280",
+        "C_SEL":    "#bfdbfe",
+        "C_HEADER": "#1a56db",
+        "C_REC":    "#dc2626",
+        "C_REC_DK": "#991b1b",
+        "C_REC_LT": "#ef4444",
+        "C_READY":  "#2563eb",
+        "C_READY_H":"#1e40af",
+        "C_TRAN":   "#6b7280",
+        "C_OK":     "#16a34a",
+        "C_INFO":   "#1d4ed8",
+        "C_WARN":   "#b45309",
+        "C_ERR":    "#b91c1c",
+        "ST_OK":    "#f0fdf4",
+        "ST_INFO":  "#eff6ff",
+        "ST_WARN":  "#fffbeb",
+        "ST_ERR":   "#fef2f2",
     },
 }
 
-# Valores iniciais: dark (padrao). Atualizados por _aplicar_tema().
-C_BG      = PALETA["dark"]["C_BG"]
-C_PANEL   = PALETA["dark"]["C_PANEL"]
-C_HEADER  = "#1a56db"
-C_BORDER  = PALETA["dark"]["C_BORDER"]
-C_REC     = "#dc2626"
-C_REC_DK  = "#991b1b"
-C_REC_LT  = "#ef4444"
-C_READY   = "#2563eb"
-C_READY_H = "#1e40af"
-C_TRAN    = "#6b7280"
-C_OK      = "#16a34a"
-C_INFO    = "#1d4ed8"
-C_WARN    = "#b45309"
-C_ERR     = "#b91c1c"
-C_TEXT    = PALETA["dark"]["C_TEXT"]
-C_TEXT2   = PALETA["dark"]["C_TEXT2"]
+# Cores que mudam com o tema; viram globais (C_BG, C_REC, ...) em _aplicar_tema().
+_CORES_TEMA = ("C_BG", "C_PANEL", "C_BORDER", "C_TEXT", "C_TEXT2", "C_HEADER",
+               "C_REC", "C_REC_DK", "C_REC_LT", "C_READY", "C_READY_H", "C_TRAN",
+               "C_OK", "C_INFO", "C_WARN", "C_ERR")
+_P = PALETA["dark"]  # valores iniciais (dark, padrao)
+C_BG, C_PANEL, C_BORDER, C_TEXT, C_TEXT2 = (_P[k] for k in _CORES_TEMA[:5])
+C_HEADER, C_REC, C_REC_DK, C_REC_LT = (_P[k] for k in _CORES_TEMA[5:9])
+C_READY, C_READY_H, C_TRAN = (_P[k] for k in _CORES_TEMA[9:12])
+C_OK, C_INFO, C_WARN, C_ERR = (_P[k] for k in _CORES_TEMA[12:])
 
 
 def opcoes_disponiveis():
@@ -344,12 +359,7 @@ class VozComandaApp:
         if tema is not None:
             self._tema = tema
         p = PALETA[self._tema]
-        global C_BG, C_PANEL, C_BORDER, C_TEXT, C_TEXT2
-        C_BG    = p["C_BG"]
-        C_PANEL = p["C_PANEL"]
-        C_BORDER= p["C_BORDER"]
-        C_TEXT  = p["C_TEXT"]
-        C_TEXT2 = p["C_TEXT2"]
+        globals().update({k: p[k] for k in _CORES_TEMA})
         self._STATUS_COR = {
             "ok":   (C_OK,   p["ST_OK"]),
             "info": (C_INFO, p["ST_INFO"]),
@@ -373,7 +383,7 @@ class VozComandaApp:
     # ---------------------------------------------------------------- UI
     def _build_ui(self):
         # ---- Cabecalho
-        hdr = tk.Frame(self.root, bg=C_HEADER, height=56)
+        self._hdr = hdr = tk.Frame(self.root, bg=C_HEADER, height=56)
         hdr.pack(fill=tk.X)
         hdr.pack_propagate(False)
 
@@ -536,7 +546,7 @@ class VozComandaApp:
             height=13,
             bg=C_PANEL, fg=C_TEXT,
             insertbackground=C_INFO,
-            selectbackground="#bfdbfe",
+            selectbackground=PALETA[self._tema]["C_SEL"],
             selectforeground=C_TEXT,
             relief="flat", bd=0,
             highlightbackground=C_BORDER,
@@ -614,7 +624,7 @@ class VozComandaApp:
         nome = self.modelo_sel.get()
         if nome == ONLINE:
             self.lbl_modelo.config(text="☁ online — sem download, precisa de internet",
-                                   fg="#1d4ed8")
+                                   fg=C_INFO)
             self.btn_carregar.config(text="Usar")
         elif modelo_baixado(nome):
             self.lbl_modelo.config(text="✔ ja baixado", fg=C_OK)
@@ -801,15 +811,28 @@ class VozComandaApp:
     def _trocar_tema(self, tema):
         if tema == self._tema:
             return
+        antiga = PALETA[self._tema]
         self._aplicar_tema(tema)
-        self._recolorir_ui()
+        self._recolorir_ui(antiga)
         cfg = carregar_config()
         cfg["tema"] = tema
         salvar_config(cfg)
 
-    def _recolorir_ui(self):
+    def _recolorir_ui(self, antiga):
         p = PALETA[self._tema]
         sel = p["C_SEL"]
+        # Cabecalho
+        self._hdr.configure(bg=C_HEADER)
+        for w in self._hdr.winfo_children():
+            w.configure(bg=C_HEADER)
+        # Botao gravar: mantem o estado (pronto / gravando / transcrevendo)
+        if self.gravando:
+            self.btn_gravar.configure(bg=C_REC, activebackground=C_REC_DK)
+        elif self.btn_gravar.cget("bg") == antiga["C_TRAN"]:
+            self.btn_gravar.configure(bg=C_TRAN, activebackground=C_TRAN)
+        else:
+            self.btn_gravar.configure(bg=C_READY, activebackground=C_READY_H)
+        self._atualizar_info_modelo()
         # Frames principais
         self._frm_mdl.configure(bg=C_PANEL)
         self._inner_mdl.configure(bg=C_PANEL)
