@@ -14,6 +14,8 @@
 | 4 | Exibe o texto numa caixa editável para revisão |
 | 5 | Salva em `comando.txt`, na pasta que você escolher — o agente lê e executa |
 
+Também **lê o texto em voz alta** (🔊 Ouvir ou F6): útil para conferir o que foi ditado, para quem tem dificuldade de leitura ou para ouvir a resposta do agente.
+
 Também funciona como **tradutor de texto**: cole qualquer texto na caixa (por exemplo, a resposta de um agente em inglês) e clique em **⇔ Traduzir**.
 
 ---
@@ -40,6 +42,9 @@ Download feito uma única vez, ficando em `models_whisper/` (ou `%LOCALAPPDATA%\
 
 ## Idiomas e tradução
 
+### Idioma da interface
+Português, inglês ou espanhol. Na primeira vez, o app segue o idioma do Windows; para trocar, clique no botão **PT / EN / ES** ao lado do tema.
+
 ### Idioma de voz
 Escolha o idioma em que você vai falar: Português BR, Português PT, Inglês, Espanhol, Francês, Alemão, Italiano, Japonês, Chinês ou Árabe. Vale para os dois modos de reconhecimento.
 
@@ -47,7 +52,7 @@ Escolha o idioma em que você vai falar: Português BR, Português PT, Inglês, 
 Marque **Traduzir para** e escolha o idioma de destino. O texto já aparece traduzido na caixa. Se a tradução falhar, o texto original é mantido e a barra de status avisa.
 
 ### Botão ⇔ Traduzir
-Traduz o texto da caixa entre português e inglês. O idioma é detectado automaticamente: texto em português vira inglês; em qualquer outro idioma, vira português. A barra de status mostra a direção usada (ex.: `EN → PT`). Textos longos são aceitos.
+Traduz o texto da caixa entre o inglês e o seu idioma de voz (se a voz for inglês, o idioma de destino). A direção é detectada automaticamente: texto em inglês vira o seu idioma; qualquer outro vira inglês. A barra de status mostra a direção usada (ex.: `EN → PT`). Textos longos são aceitos.
 
 ### Limites da tradução
 A tradução usa o [MyMemory](https://mymemory.translated.net/), gratuito e sem chave de API. Ela precisa de internet e envia o texto ao MyMemory.
@@ -63,6 +68,17 @@ A qualidade é boa, mas o MyMemory às vezes escolhe o sentido errado de uma pal
 
 ---
 
+## Leitura em voz alta
+
+O botão **🔊 Ouvir** (ou **F6**) lê o texto da caixa; clique de novo para parar. O idioma da leitura é detectado pelo texto (inglês ou o seu idioma).
+
+| Modo              | Voz usada                                                                 |
+|-------------------|---------------------------------------------------------------------------|
+| Google (online)   | Voz neural da Microsoft, natural, em todos os idiomas. Envia o texto à Microsoft. Sem internet, usa a voz do Windows |
+| Offline (Whisper) | Voz do Windows instalada para o idioma. Nada sai do computador            |
+
+Se o Windows não tiver voz para o idioma, instale em *Configurações > Hora e idioma > Fala*.
+
 ## Pontuação
 
 A caixa **Pontuação** controla a formatação do texto transcrito:
@@ -70,9 +86,9 @@ A caixa **Pontuação** controla a formatação do texto transcrito:
 | Modo              | Marcada                                  | Desmarcada                                  |
 |-------------------|------------------------------------------|---------------------------------------------|
 | Offline (Whisper) | Pontuação e maiúsculas do próprio modelo | Pontuação removida                          |
-| Google (online)   | Primeira letra maiúscula e ponto final   | Texto como o Google devolve, sem pontuação  |
+| Google (online)   | Ponto nas pausas longas, vírgula nas curtas, maiúscula no início das frases | Texto como o Google devolve, sem pontuação  |
 
-Os acentos são sempre mantidos. O Google gratuito não devolve vírgulas; para pontuação completa, use um modelo offline (`small` ou maior).
+Os acentos são sempre mantidos. O Google gratuito não devolve pontuação nenhuma: com a caixa marcada, o app corta o áudio nas pausas, reconhece cada trecho e junta com vírgula ou ponto conforme a duração da pausa. Ele não acerta pontos de interrogação; para pontuação completa, use um modelo offline (`small` ou maior).
 
 ---
 
@@ -91,6 +107,9 @@ sounddevice       >= 0.4.6
 numpy             >= 1.21
 SpeechRecognition >= 3.10
 deep-translator   >= 1.11.4
+sv-ttk            >= 2.6
+edge-tts          >= 7.0
+comtypes          >= 1.4
 ```
 
 ---
@@ -123,6 +142,7 @@ python vozComanda_bootstrap.py
 |-----------|-------------------------|
 | `F5`      | Gravar / Parar          |
 | `Space`   | Gravar / Parar (fora da caixa de texto) |
+| `F6`      | Ouvir / parar a leitura |
 | `Ctrl+S`  | Salvar comando          |
 | `Ctrl+L`  | Limpar texto            |
 

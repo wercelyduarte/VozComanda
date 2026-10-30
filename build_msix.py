@@ -47,6 +47,8 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
   </Dependencies>
   <Resources>
     <Resource Language="pt-BR" />
+    <Resource Language="en" />
+    <Resource Language="es" />
   </Resources>
   <Applications>
     <Application Id="VozComanda" Executable="VozComanda.exe" EntryPoint="Windows.FullTrustApplication">

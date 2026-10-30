@@ -4,3 +4,5 @@ numpy>=1.21
 SpeechRecognition>=3.10
 deep-translator>=1.11.4
 sv-ttk>=2.6
+edge-tts>=7.0
+comtypes>=1.4

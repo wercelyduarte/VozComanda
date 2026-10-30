@@ -35,6 +35,8 @@ DEPENDENCIAS = [
     ("speech_recognition", "SpeechRecognition"),
     ("deep_translator", "deep-translator"),
     ("sv_ttk", "sv-ttk"),
+    ("edge_tts", "edge-tts"),
+    ("comtypes", "comtypes"),
 ]
 
 

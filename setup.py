@@ -40,6 +40,7 @@ build_exe_options = {
         "faster_whisper", "ctranslate2", "onnxruntime", "tokenizers",
         "huggingface_hub", "av", "numpy", "sounddevice", "_sounddevice_data",
         "tkinter", "encodings", "speech_recognition", "deep_translator", "sv_ttk",
+        "edge_tts", "aiohttp", "certifi", "comtypes",   # leitura em voz alta
     ],
     "excludes": ["pyautogui", "pyperclip", "matplotlib", "pandas", "scipy",
                  "torch", "IPython", "pytest", "PyQt5", "PyQt6"],

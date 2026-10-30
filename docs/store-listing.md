@@ -1,6 +1,6 @@
 # Microsoft Store listing
 
-Texts pasted into Partner Center → Listagens da Store. The package declares pt-BR (the app's interface language); English and Spanish are extra listing languages, and both say the interface is in Portuguese. All three use the same screenshots. Keep this file in sync when the app changes.
+Texts pasted into Partner Center → Listagens da Store. The app's interface is in Portuguese, English and Spanish (it follows the Windows language; the PT/EN/ES button switches it). Each listing uses the screenshots of its own language. Keep this file in sync when the app changes.
 
 ## Português (Brasil) — pt-br
 
@@ -17,10 +17,12 @@ Clique em Gravar (ou aperte F5), fale e clique em Parar. O texto aparece numa ca
 • 10 idiomas de voz, incluindo português, inglês e espanhol
 • Fale em português e receba o texto já traduzido para o inglês
 • Botão Traduzir: cole a resposta do agente em inglês e leia em português
+• Botão Ouvir: o app lê o texto em voz alta, para você conferir o que ditou
 • Histórico de todos os comandos salvos, com data e hora
+• Interface em português, inglês e espanhol
 • Atalhos de teclado, tema claro e escuro
 
-Feito para quem prefere ditar, tem dificuldade para digitar ou quer conversar com a IA em português e mandar o pedido em inglês.
+Feito para quem tem dificuldade para digitar, prefere falar e ouvir o texto, ou quer conversar com a IA em português e mandar o pedido em inglês.
 
 Gratuito e de código aberto. Sem conta, sem anúncios.
 
@@ -31,8 +33,9 @@ Gratuito e de código aberto. Sem conta, sem anúncios.
 - 10 idiomas de voz
 - Tradução automática ao ditar
 - Tradução de textos colados, português ⇄ inglês
+- Leitura do texto em voz alta (Ouvir ou F6)
 - Salva em comando.txt para agentes de IA, com histórico
-- Tema claro e escuro
+- Português, inglês e espanhol; tema claro e escuro
 
 **Descrição resumida:** Fale em vez de digitar: transforme sua voz em comandos para agentes de IA como Claude Code, Kiro e Cursor, com tradução automática para o inglês e modo offline.
 
@@ -46,7 +49,7 @@ ditado por voz · voz para texto · claude code · whisper · transcrição · t
 
 **Requisitos de hardware:** Microfone (obrigatório).
 
-**Capturas de tela** (1366×768, em [store-screens/](store-screens/)), nesta ordem:
+**Capturas de tela** (1366×768, em [store-screens/](store-screens/)`<idioma>/`; a mesma ordem nos três idiomas):
 
 1. `1-ditado-escuro.png` — Texto ditado em português, salvo para o agente
 2. `2-traducao-escuro.png` — Fale em português, receba em inglês
@@ -64,13 +67,13 @@ Click Record (or press F5), speak and click Stop. The text shows up in a box for
 • Offline mode with Whisper: your voice never leaves your computer
 • 10 voice languages, including English, Spanish and Portuguese
 • Speak in one language and get the text already translated into another
-• Translate button: paste the agent's answer and read it in Portuguese
+• Translate button: paste the agent's answer in English and read it in your language
+• Listen button: the app reads the text aloud so you can check what you dictated
 • History of every saved command, with date and time
+• Interface in English, Spanish and Portuguese
 • Keyboard shortcuts, light and dark theme
 
-Made for people who would rather dictate, find typing hard, or want to talk to AI in their own language and send the request in English.
-
-The interface is in Portuguese.
+Made for people who find typing hard, would rather speak and listen to the text, or want to talk to AI in their own language and send the request in English.
 
 Free and open source. No account, no ads.
 
@@ -82,9 +85,10 @@ Free and open source. No account, no ads.
 - Offline mode (Whisper): your voice stays on your PC
 - 10 voice languages
 - Automatic translation while you dictate
-- Translate pasted text between Portuguese and English
+- Translate pasted text between English and your language
+- Reads the text aloud (Listen or F6)
 - Saves to comando.txt for AI agents, with history
-- Light and dark theme
+- English, Spanish and Portuguese; light and dark theme
 
 **Keywords:** voice dictation · speech to text · claude code · whisper · voice typing · translator · ai agent
 
@@ -100,13 +104,13 @@ Haz clic en Grabar (o pulsa F5), habla y haz clic en Parar. El texto aparece en 
 • Modo sin conexión con Whisper: tu voz no sale de tu computadora
 • 10 idiomas de voz, entre ellos español, inglés y portugués
 • Habla en un idioma y recibe el texto ya traducido a otro
-• Botón Traducir: pega la respuesta del agente y léela en portugués
+• Botón Traducir: pega la respuesta del agente en inglés y léela en tu idioma
+• Botón Escuchar: la app lee el texto en voz alta para que revises lo que dictaste
 • Historial de todos los comandos guardados, con fecha y hora
+• Interfaz en español, inglés y portugués
 • Atajos de teclado, tema claro y oscuro
 
-Pensado para quien prefiere dictar, tiene dificultad para escribir o quiere hablar con la IA en su idioma y enviar el pedido en inglés.
-
-La interfaz está en portugués.
+Pensado para quien tiene dificultad para escribir, prefiere hablar y escuchar el texto, o quiere hablar con la IA en su idioma y enviar el pedido en inglés.
 
 Gratis y de código abierto. Sin cuenta y sin anuncios.
 
@@ -118,9 +122,10 @@ Gratis y de código abierto. Sin cuenta y sin anuncios.
 - Modo sin conexión (Whisper): tu voz no sale del PC
 - 10 idiomas de voz
 - Traducción automática al dictar
-- Traducción de textos pegados entre portugués e inglés
+- Traducción de textos pegados entre inglés y tu idioma
+- Lee el texto en voz alta (Escuchar o F6)
 - Guarda en comando.txt para agentes de IA, con historial
-- Tema claro y oscuro
+- Español, inglés y portugués; tema claro y oscuro
 
 **Palabras clave:** dictado por voz · voz a texto · claude code · whisper · transcripción · traductor · agente ia
 
