@@ -49,6 +49,10 @@ parts:
     plugin: python
     source: .
     python-requirements: [requirements.txt]
+    # setup.py e o build do Windows (cx_Freeze); sem ele o plugin instala so os requirements
+    override-pull: |
+      craftctl default
+      rm -f setup.py
     stage-packages:
       - python3-venv      # o base core24 nao tem Python: o snap leva o seu
       - python3-tk
