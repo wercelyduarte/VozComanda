@@ -22,6 +22,10 @@ description: |
 
   Made for people who find typing hard, or who would rather speak and listen.
 grade: stable
+website: https://github.com/wercelyduarte/VozComanda
+source-code: https://github.com/wercelyduarte/VozComanda
+issues: https://github.com/wercelyduarte/VozComanda/issues
+contact: https://github.com/wercelyduarte/VozComanda/issues
 confinement: strict
 icon: snap/gui/vozcomanda.png
 
@@ -29,15 +33,18 @@ apps:
   vozcomanda:
     command: usr/bin/python3 $SNAP/app/vozComanda.py
     desktop: app/vozcomanda.desktop
-    extensions: [gnome]
+    # Sem a extensao gnome: ela omite os pacotes que a plataforma GNOME ja tem, inclusive
+    # o Python, e o Python dela nao tem Tkinter. O Tk so precisa de X11 e das fontes.
     plugs:
+      - x11
+      - desktop           # fontes e tema do sistema
+      - desktop-legacy
       - network           # Google, traducao, voz online, download dos modelos
       - audio-record      # microfone
       - audio-playback    # leitura em voz alta
       - home              # salvar comando.txt na pasta do projeto
     environment:
-      # O Python do snap (com Tkinter) e as bibliotecas instaladas pelo plugin; sem isso
-      # o venv acha a biblioteca padrao do pacote do GNOME, que nao tem Tkinter
+      # O Python que o snap leva (com Tkinter) e as bibliotecas instaladas pelo plugin
       PYTHONHOME: $SNAP/usr
       PYTHONPATH: $SNAP/lib/python3.12/site-packages
       # Tk procura init.tcl no caminho do sistema, que fica fora do snap
@@ -45,7 +52,7 @@ apps:
       TK_LIBRARY: $SNAP/usr/share/tcltk/tk8.6
       # PortAudio fala ALSA; o asound.conf manda o ALSA para o PulseAudio/PipeWire do usuario
       ALSA_CONFIG_PATH: $SNAP/etc/asound.conf
-      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/alsa-lib
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$SNAP/usr/lib:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pulseaudio:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/alsa-lib
       ESPEAK_DATA_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/espeak-ng-data
 
 parts:
@@ -63,6 +70,7 @@ parts:
       - libportaudio2     # sounddevice
       - libasound2-plugins  # ponte ALSA -> PulseAudio
       - espeak-ng         # voz offline
+      - fonts-dejavu-core # simbolos dos botoes (fallback se o sistema nao tiver)
     prime:
       - -usr/share/doc
       - -usr/share/man
