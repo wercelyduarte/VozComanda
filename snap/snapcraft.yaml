@@ -84,6 +84,7 @@ parts:
   app:
     plugin: dump
     source: .
+    build-packages: [git]   # para ler a versao da tag
     override-pull: |
       craftctl default
       # A copia da parte nao e um repositorio git: a tag vem da pasta do projeto
