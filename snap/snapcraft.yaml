@@ -22,6 +22,7 @@ description: |
 
   Made for people who find typing hard, or who would rather speak and listen.
 grade: stable
+license: MIT
 website: https://github.com/wercelyduarte/VozComanda
 source-code: https://github.com/wercelyduarte/VozComanda
 issues: https://github.com/wercelyduarte/VozComanda/issues
