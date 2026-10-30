@@ -48,18 +48,21 @@ except ImportError:
     _sv_ttk = None
 
 # ------------------------------------------------------------------ config
+WINDOWS = sys.platform == "win32"
 if getattr(sys, "frozen", False):
     APP_DIR = os.path.dirname(sys.executable)
-    BASE_DIR = os.environ.get("VOZ_DATA_DIR") or os.path.join(
-        os.environ.get("LOCALAPPDATA", APP_DIR), "VozComanda")
-    os.makedirs(BASE_DIR, exist_ok=True)
+    BASE_DIR = os.path.join(os.environ.get("LOCALAPPDATA", APP_DIR), "VozComanda")
     if sys.stdout is None:
         sys.stdout = open(os.devnull, "w")
     if sys.stderr is None:
         sys.stderr = open(os.devnull, "w")
 else:
     APP_DIR = os.path.dirname(os.path.abspath(__file__))
-    BASE_DIR = APP_DIR
+    # No snap a pasta do app e somente leitura; SNAP_USER_COMMON vale para todas as
+    # revisoes, entao os modelos (ate 3 GB) nao se repetem a cada atualizacao.
+    BASE_DIR = os.environ.get("SNAP_USER_COMMON") or APP_DIR
+BASE_DIR = os.environ.get("VOZ_DATA_DIR") or BASE_DIR
+os.makedirs(BASE_DIR, exist_ok=True)
 
 COMANDO_TXT = os.path.join(BASE_DIR, "comando.txt")
 HIST_DIR    = os.path.join(BASE_DIR, "historico")
@@ -161,7 +164,23 @@ LCID_WINDOWS = {
     "pt-BR": 0x416, "pt-PT": 0x816, "en": 0x409, "es": 0xC0A, "fr": 0x40C,
     "de": 0x407, "it": 0x410, "ja": 0x411, "zh": 0x804, "ar": 0x401,
 }
+VOZES_ESPEAK = {   # voz offline no Linux (espeak-ng)
+    "pt-BR": "pt-br", "pt-PT": "pt", "en": "en-us", "es": "es", "fr": "fr",
+    "de": "de", "it": "it", "ja": "ja", "zh": "cmn", "ar": "ar",
+}
 TAXA_VOZ = 24000   # Hz do audio decodificado da voz online
+
+# O Tk do Linux mostra emoji como quadrados (ou trava com emoji colorido):
+# fora do Windows eles viram simbolos que as fontes comuns tem.
+EMOJI_LINUX = {"🔊 ": "", "💾 ": "", "🎤": "", "🌙": "☾", "☀️": "☀"}
+
+
+def _sem_emoji(texto: str) -> str:
+    if WINDOWS:
+        return texto
+    for emoji, troca in EMOJI_LINUX.items():
+        texto = texto.replace(emoji, troca)
+    return texto
 
 
 def _codigo_idioma(valor, tabela, padrao):
@@ -281,7 +300,8 @@ TEXTS = {
         "st_nada_ouvir":    "Nada para ler.",
         "st_gerando_voz":   "Gerando a voz...",
         "st_lendo":         "Lendo em voz alta ({idioma}). F6 para parar.",
-        "st_lendo_offline": "Sem conexão com a voz online — lendo com a voz do Windows ({idioma}).",
+        "st_lendo_offline": "Sem conexão com a voz online — lendo com a voz do sistema ({idioma}).",
+        "st_sem_espeak":    "Nenhuma voz offline instalada. Instale com: sudo apt install espeak-ng, ou use o modo Google online.",
         "st_sem_voz":       "Nenhuma voz do Windows para {idioma}. Instale em Configurações > Hora e idioma > Fala, ou use o modo Google online.",
         "st_erro_voz":      "Erro ao ler o texto: {erro}",
     },
@@ -355,7 +375,8 @@ TEXTS = {
         "st_nada_ouvir":    "Nothing to read.",
         "st_gerando_voz":   "Generating the voice...",
         "st_lendo":         "Reading aloud ({idioma}). F6 to stop.",
-        "st_lendo_offline": "No connection to the online voice — reading with the Windows voice ({idioma}).",
+        "st_lendo_offline": "No connection to the online voice — reading with the system voice ({idioma}).",
+        "st_sem_espeak":    "No offline voice installed. Install one with: sudo apt install espeak-ng, or use Google online mode.",
         "st_sem_voz":       "No Windows voice for {idioma}. Install one in Settings > Time & language > Speech, or use Google online mode.",
         "st_erro_voz":      "Error reading the text: {erro}",
     },
@@ -429,7 +450,8 @@ TEXTS = {
         "st_nada_ouvir":    "Nada que leer.",
         "st_gerando_voz":   "Generando la voz...",
         "st_lendo":         "Leyendo en voz alta ({idioma}). F6 para detener.",
-        "st_lendo_offline": "Sin conexión con la voz en línea — leyendo con la voz de Windows ({idioma}).",
+        "st_lendo_offline": "Sin conexión con la voz en línea — leyendo con la voz del sistema ({idioma}).",
+        "st_sem_espeak":    "No hay voz sin conexión instalada. Instálala con: sudo apt install espeak-ng, o usa el modo Google en línea.",
         "st_sem_voz":       "No hay voz de Windows para {idioma}. Instala una en Configuración > Hora e idioma > Voz, o usa el modo Google en línea.",
         "st_erro_voz":      "Error al leer el texto: {erro}",
     },
@@ -632,7 +654,11 @@ class VozComandaApp:
         self.root.resizable(True, True)
         self.root.minsize(660, 500)
         try:
-            self.root.iconbitmap(os.path.join(APP_DIR, "icone.ico"))
+            if WINDOWS:
+                self.root.iconbitmap(os.path.join(APP_DIR, "icone.ico"))
+            else:   # o Tk do Linux nao le .ico
+                self._icone = tk.PhotoImage(file=os.path.join(APP_DIR, "icone.png"))
+                self.root.iconphoto(True, self._icone)
         except Exception:
             pass
 
@@ -646,6 +672,7 @@ class VozComandaApp:
         self._lendo = 0        # numero da leitura em curso (0 = nenhuma); descarta respostas antigas
         self._leituras = 0
         self._sapi = None      # voz do Windows, criada no primeiro uso
+        self._espeak = None    # processo do espeak-ng (voz offline no Linux)
 
         cfg = carregar_config()
         escolhido = cfg.get("modelo", MODEL_SIZE)
@@ -685,7 +712,7 @@ class VozComandaApp:
 
     # ---------------------------------------------------------------- idioma
     def t(self, chave: str, **kw) -> str:
-        texto = TEXTS[self._lang].get(chave, TEXTS["pt"].get(chave, chave))
+        texto = _sem_emoji(TEXTS[self._lang].get(chave, TEXTS["pt"].get(chave, chave)))
         return texto.format(**kw) if kw else texto
 
     def _reg(self, widget, chave: str):
@@ -763,7 +790,7 @@ class VozComandaApp:
         hdr.pack(fill=tk.X)
         hdr.pack_propagate(False)
 
-        tk.Label(hdr, text="🎤", bg=C_HEADER, fg="white",
+        tk.Label(hdr, text=_sem_emoji("🎤"), bg=C_HEADER, fg="white",
                  font=("Segoe UI", 20)).pack(side=tk.LEFT, padx=(14, 6), pady=8)
         tk.Label(hdr, text="VozComanda", bg=C_HEADER, fg="white",
                  font=("Segoe UI", 15, "bold")).pack(side=tk.LEFT, pady=8)
@@ -805,7 +832,7 @@ class VozComandaApp:
         self.btn_pasta.bind("<Leave>", lambda e: self.btn_pasta.config(fg=C_TEXT2))
 
         # Botao de alternância de tema (🌙 dark / ☀️ light)
-        _icone_tema = "🌙" if self._tema == "dark" else "☀️"
+        _icone_tema = _sem_emoji("🌙" if self._tema == "dark" else "☀️")
         self.btn_tema = tk.Button(
             inner, text=_icone_tema, command=self._toggle_tema,
             bg=C_PANEL, fg=C_TEXT2,
@@ -1189,7 +1216,7 @@ class VozComandaApp:
             threading.Thread(target=self._gerar_voz_online, args=(texto, idioma, token),
                              daemon=True).start()
         else:
-            self._ler_com_windows(texto, idioma, token, "st_lendo")
+            self._ler_offline(texto, idioma, token, "st_lendo")
 
     def _gerar_voz_online(self, texto, idioma, token):
         try:
@@ -1209,7 +1236,7 @@ class VozComandaApp:
                                       for quadro in arq.decode(audio=0) for q in conv.resample(quadro)])
             self.root.after(0, lambda: self._tocar_voz(pcm, idioma, token))
         except Exception:
-            self.root.after(0, lambda: self._ler_com_windows(texto, idioma, token, "st_lendo_offline"))
+            self.root.after(0, lambda: self._ler_offline(texto, idioma, token, "st_lendo_offline"))
 
     def _tocar_voz(self, pcm, idioma, token):
         if token != self._lendo:   # o usuario parou antes de a voz chegar
@@ -1218,9 +1245,34 @@ class VozComandaApp:
         self.set_status(self.t("st_lendo", idioma=self._nome_idioma(idioma)), "ok")
         self.root.after(int(len(pcm) / TAXA_VOZ * 1000) + 300, lambda: self._fim_leitura(token))
 
-    def _ler_com_windows(self, texto, idioma, token, chave_status):
+    def _ler_offline(self, texto, idioma, token, chave_status):
         if token != self._lendo:
             return
+        if WINDOWS:
+            self._ler_com_windows(texto, idioma, token, chave_status)
+        else:
+            self._ler_com_espeak(texto, idioma, token, chave_status)
+
+    def _ler_com_espeak(self, texto, idioma, token, chave_status):
+        import subprocess
+        try:
+            self._espeak = subprocess.Popen(["espeak-ng", "-v", VOZES_ESPEAK[idioma], "--", texto])
+        except FileNotFoundError:
+            self._fim_leitura(token)
+            self.set_status(self.t("st_sem_espeak"), "warn")
+            return
+        self.set_status(self.t(chave_status, idioma=self._nome_idioma(idioma)), "ok")
+        self._vigiar_espeak(token)
+
+    def _vigiar_espeak(self, token):
+        if token != self._lendo:
+            return
+        if self._espeak.poll() is None:
+            self.root.after(250, lambda: self._vigiar_espeak(token))
+        else:
+            self._fim_leitura(token)
+
+    def _ler_com_windows(self, texto, idioma, token, chave_status):
         try:
             if self._sapi is None:
                 import comtypes.client
@@ -1256,6 +1308,8 @@ class VozComandaApp:
         sd.stop()
         if self._sapi is not None:
             self._sapi.Speak("", 3)   # 3 = assincrono + descarta a fala em curso
+        if self._espeak is not None and self._espeak.poll() is None:
+            self._espeak.terminate()
         self.btn_ouvir.config(text=self.t("btn_ouvir"))
 
     def _fim_leitura(self, token):
@@ -1351,7 +1405,7 @@ class VozComandaApp:
                                  activebackground=C_BG, activeforeground=C_TEXT)
         self.btn_pasta.bind("<Leave>", lambda e: self.btn_pasta.config(fg=C_TEXT2))
         self.btn_pasta.bind("<Enter>", lambda e: self.btn_pasta.config(fg=C_TEXT))
-        _icone = "🌙" if self._tema == "dark" else "☀️"
+        _icone = _sem_emoji("🌙" if self._tema == "dark" else "☀️")
         self.btn_tema.configure(bg=C_PANEL, fg=C_TEXT2, text=_icone,
                                 activebackground=C_BG, activeforeground=C_TEXT)
         self.btn_tema.bind("<Leave>", lambda e: self.btn_tema.config(fg=C_TEXT2))

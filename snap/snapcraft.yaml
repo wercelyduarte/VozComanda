@@ -1,0 +1,77 @@
+# Pacote Snap (Snap Store / Ubuntu). Gerado pelo workflow .github/workflows/snap.yml:
+#   snapcraft pack            -> vozcomanda_X.Y.Z_amd64.snap
+# A versao vem da ultima tag do git (vX.Y.Z).
+name: vozcomanda
+title: VozComanda
+base: core24
+adopt-info: app
+summary: Voice dictation for AI agents, with translation and read-aloud
+description: |
+  Talk instead of typing: VozComanda turns your voice into text ready to send to
+  an AI coding agent such as Claude Code, Kiro, Cursor or ChatGPT.
+
+  Click Record (or press F5), speak and click Stop. The text shows up in a box for
+  you to review. Ctrl+S saves it to comando.txt in your project folder, where the
+  agent reads and runs it.
+
+  - Online recognition with Google, or offline with Whisper (your voice stays on your PC)
+  - 10 voice languages, automatic translation while you dictate
+  - Translate button: paste the agent's answer and read it in your language
+  - Listen button (F6): the app reads the text aloud
+  - Interface in English, Spanish and Portuguese; light and dark theme
+
+  Made for people who find typing hard, or who would rather speak and listen.
+grade: stable
+confinement: strict
+icon: snap/gui/vozcomanda.png
+
+apps:
+  vozcomanda:
+    command: bin/python3 $SNAP/app/vozComanda.py
+    desktop: app/vozcomanda.desktop
+    extensions: [gnome]
+    plugs:
+      - network           # Google, traducao, voz online, download dos modelos
+      - audio-record      # microfone
+      - audio-playback    # leitura em voz alta
+      - home              # salvar comando.txt na pasta do projeto
+    environment:
+      # Tk procura init.tcl no caminho do sistema, que fica fora do snap
+      TCL_LIBRARY: $SNAP/usr/share/tcltk/tcl8.6
+      TK_LIBRARY: $SNAP/usr/share/tcltk/tk8.6
+      # PortAudio fala ALSA; o asound.conf manda o ALSA para o PulseAudio/PipeWire do usuario
+      ALSA_CONFIG_PATH: $SNAP/etc/asound.conf
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/alsa-lib
+      ESPEAK_DATA_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/espeak-ng-data
+
+parts:
+  deps:
+    plugin: python
+    source: .
+    python-requirements: [requirements.txt]
+    stage-packages:
+      - python3-venv      # o base core24 nao tem Python: o snap leva o seu
+      - python3-tk
+      - libportaudio2     # sounddevice
+      - libasound2-plugins  # ponte ALSA -> PulseAudio
+      - espeak-ng         # voz offline
+    prime:
+      - -usr/share/doc
+      - -usr/share/man
+
+  app:
+    plugin: dump
+    source: .
+    override-pull: |
+      craftctl default
+      craftctl set version="$(git describe --tags --abbrev=0 | sed 's/^v//')"
+    organize:
+      vozComanda.py: app/vozComanda.py
+      icone.png: app/icone.png
+      snap/local/vozcomanda.desktop: app/vozcomanda.desktop
+      snap/local/asound.conf: etc/asound.conf
+    prime:
+      - app/vozComanda.py
+      - app/icone.png
+      - app/vozcomanda.desktop
+      - etc/asound.conf

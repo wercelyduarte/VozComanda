@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=VozComanda
+GenericName=Voice dictation
+GenericName[pt_BR]=Ditado por voz
+GenericName[es]=Dictado por voz
+Comment=Voice dictation for AI agents, with translation and read-aloud
+Comment[pt_BR]=Ditado por voz para agentes de IA, com tradução e leitura em voz alta
+Comment[es]=Dictado por voz para agentes de IA, con traducción y lectura en voz alta
+Exec=vozcomanda
+Icon=${SNAP}/meta/gui/vozcomanda.png
+Categories=Utility;Accessibility;Development;
+Keywords=dictation;speech;voice;transcription;whisper;translate;claude;
+Terminal=false

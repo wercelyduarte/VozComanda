@@ -45,6 +45,7 @@ build_exe_options = {
     "excludes": ["pyautogui", "pyperclip", "matplotlib", "pandas", "scipy",
                  "torch", "IPython", "pytest", "PyQt5", "PyQt6"],
     "include_files": [("icone.ico", "icone.ico"),  # icone da janela do app
+                      ("icone.png", "icone.png"),
                       ("VERSION", "VERSION")],
     "include_msvcr": True,
     "optimize": 1,

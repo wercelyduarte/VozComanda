@@ -1,0 +1,53 @@
+# Gera o snap (Linux) em toda tag vX.Y.Z e sob demanda; instala, abre o app numa tela
+# virtual e guarda uma captura. Publica na Snap Store quando ha tag e o segredo
+# SNAPCRAFT_STORE_CREDENTIALS existe (snapcraft export-login, veja o README).
+name: Snap
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  snap:
+    runs-on: ubuntu-24.04
+    env:
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # a versao do snap vem da ultima tag
+
+      - uses: snapcore/action-build@v1
+        id: build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snap
+          path: ${{ steps.build.outputs.snap }}
+
+      - name: Testar o app instalado
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb imagemagick
+          sudo snap install --dangerous "${{ steps.build.outputs.snap }}"
+          snap connections vozcomanda
+          xvfb-run -a -s "-screen 0 1280x800x24" bash -c '
+            vozcomanda > app.log 2>&1 &
+            sleep 25
+            import -window root tela.png
+            pgrep -f vozComanda.py > /dev/null || { echo "::error::o app fechou"; cat app.log; exit 1; }
+          '
+          cat app.log
+          snap run --shell vozcomanda -c 'espeak-ng --version && "$SNAP/bin/python3" -c "import tkinter, sounddevice, faster_whisper, edge_tts, speech_recognition, deep_translator, sv_ttk; print(1)"'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snap-tela
+          path: tela.png
+
+      - uses: snapcore/action-publish@v1
+        if: startsWith(github.ref, 'refs/tags/v') && env.SNAPCRAFT_STORE_CREDENTIALS != ''
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: stable

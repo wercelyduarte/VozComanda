@@ -186,6 +186,20 @@ Requer instalação prévia das dependências de build:
 pip install -r requirements-build.txt
 ```
 
+### Linux (Snap)
+
+```bash
+sudo snap install vozcomanda        # quando estiver publicado na Snap Store
+```
+
+O snap é gerado pelo workflow `.github/workflows/snap.yml` (em toda tag `vX.Y.Z`, ou manualmente em *Actions*), a partir de [snap/snapcraft.yaml](snap/snapcraft.yaml). No Linux a voz offline do botão Ouvir é o espeak-ng (já vem no snap) e os dados ficam em `~/snap/vozcomanda/common`. Fora do snap, rode `python3 vozComanda_bootstrap.py` (precisa de `python3-tk`, `libportaudio2` e, para a voz offline, `espeak-ng`).
+
+Para o workflow publicar sozinho, gere a credencial uma vez e salve como segredo `SNAPCRAFT_STORE_CREDENTIALS` no GitHub:
+
+```bash
+snapcraft export-login --snaps=vozcomanda --acls package_access,package_push,package_update,package_release -
+```
+
 ### Microsoft Store (.msix)
 
 ```bash

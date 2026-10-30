@@ -36,8 +36,9 @@ DEPENDENCIAS = [
     ("deep_translator", "deep-translator"),
     ("sv_ttk", "sv-ttk"),
     ("edge_tts", "edge-tts"),
-    ("comtypes", "comtypes"),
 ]
+if sys.platform == "win32":
+    DEPENDENCIAS.append(("comtypes", "comtypes"))   # voz offline do Windows (SAPI)
 
 
 def _versao_minima(pkg_pip):
@@ -54,7 +55,7 @@ def _versao_minima(pkg_pip):
                 nome = re.split(r"[<>=!~\[]", linha, 1)[0].strip()
                 if nome.lower() == pkg_pip.lower():
                     # pega o trecho a partir do primeiro >= / == / ~= etc.
-                    m = re.search(r"(>=|==|~=|>|<).*$", linha)
+                    m = re.search(r"(>=|==|~=|>|<)[^;#]*", linha)   # sem o marcador "; sys_platform"
                     return m.group(0).strip() if m else ""
     except Exception:
         pass
