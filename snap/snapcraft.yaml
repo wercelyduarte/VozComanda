@@ -94,8 +94,10 @@ parts:
       icone.png: app/icone.png
       snap/local/vozcomanda.desktop: app/vozcomanda.desktop
       snap/local/asound.conf: etc/asound.conf
+      snap/local/sitecustomize.py: lib/python3.12/site-packages/sitecustomize.py
     prime:
       - app/vozComanda.py
       - app/icone.png
       - app/vozcomanda.desktop
       - etc/asound.conf
+      - lib/python3.12/site-packages/sitecustomize.py
