@@ -44,6 +44,12 @@ ditado por voz · voz para texto · claude code · whisper · transcrição · t
 
 **Requisitos de hardware:** Microfone (obrigatório).
 
+**Capturas de tela** (1366×768, em [store-screens/](store-screens/)), nesta ordem:
+
+1. `1-ditado-escuro.png` — Texto ditado em português, salvo para o agente
+2. `2-traducao-escuro.png` — Fale em português, receba em inglês
+3. `3-offline-claro.png` — Modo offline com Whisper, tema claro
+
 ## Restricted capability justification (Opções de envio, 500 characters)
 
 **runFullTrust**
