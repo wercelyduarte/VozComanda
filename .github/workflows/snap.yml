@@ -38,7 +38,7 @@ jobs:
             pgrep -f vozComanda.py > /dev/null || { echo "::error::o app fechou"; cat app.log; exit 1; }
           '
           cat app.log
-          snap run --shell vozcomanda -c 'espeak-ng --version && "$SNAP/bin/python3" -c "import tkinter, sounddevice, faster_whisper, edge_tts, speech_recognition, deep_translator, sv_ttk; print(1)"'
+          snap run --shell vozcomanda -c 'espeak-ng --version && "$SNAP/usr/bin/python3" -c "import sys, tkinter, sounddevice, faster_whisper, edge_tts, speech_recognition, deep_translator, sv_ttk; print(sys.version, tkinter.TkVersion)"'
 
       - uses: actions/upload-artifact@v4
         if: always()
