@@ -41,7 +41,7 @@ Gratuito e de código aberto. Sem conta, sem anúncios.
 
 **Termos de pesquisa** (até 7)
 
-ditado por voz · voz para texto · claude code · whisper · transcrição · tradutor · agente ia
+ditado por voz · voz para texto · acessibilidade · ditado offline · transcrição · tradutor · agente ia
 
 **Notas de direitos autorais:** © 2026 WD Software
 
@@ -90,7 +90,7 @@ Free and open source. No account, no ads.
 - Saves to comando.txt for AI agents, with history
 - English, Spanish and Portuguese; light and dark theme
 
-**Keywords:** voice dictation · speech to text · claude code · whisper · voice typing · translator · ai agent
+**Keywords:** voice dictation · speech to text · accessibility · offline dictation · voice typing · translator · ai agent
 
 ## Español — es (additional listing language)
 
@@ -127,7 +127,7 @@ Gratis y de código abierto. Sin cuenta y sin anuncios.
 - Guarda en comando.txt para agentes de IA, con historial
 - Español, inglés y portugués; tema claro y oscuro
 
-**Palabras clave:** dictado por voz · voz a texto · claude code · whisper · transcripción · traductor · agente ia
+**Palabras clave:** dictado por voz · voz a texto · accesibilidad · dictado sin conexión · transcripción · traductor · agente ia
 
 ## Restricted capability justification (Opções de envio, 500 characters)
 
